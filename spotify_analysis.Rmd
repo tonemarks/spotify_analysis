@@ -1,0 +1,63 @@
+---
+title: "Spotify Analysis"
+author: "Antonio Marks"
+date: "10/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("dplyr")
+# install.packages("remotes")
+# remotes::install_github("charlie86/spotifyr")
+# install.packages("ggplot2")
+
+library(ggplot2)
+library(remotes)
+library(dplyr)
+library(spotifyr)
+```
+
+```{r setup-spotify}
+
+
+load("data/token.rda")
+
+Sys.setenv(SPOTIFY_CLIENT_ID = client)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+access_token <- get_spotify_access_token()
+# get_spotify_authorization_code()
+```
+
+
+
+## Analysis of how music tastes has changed
+
+Notes:
+1. Make sure you locally store your client id and client secret so you don't share them with others.
+2. Since you're not pulling data from your our account but rather public data, the spotifyr package should work, i.e. we're not going to have the problems we had before.
+3. More information about the package and how to create your spotify API access [here](https://github.com/charlie86/spotifyr).
+
+The following code chunk can be used to get all the songs by an artist. The output is a dataframe of songs, including song names, album names, album release date, album popularity, song popularity, danceability, energy, loudness, mode, speechiness, instrumentalness, livenss, acousticness, valence, tempo, and duration. 
+
+For example , we used the *"Spotifyr"* Package to get the data about Drake's 2018 album 'Scorpion'
+
+```{r}
+scorpion <- get_artist_audio_features('Drake') %>%
+  filter(album_name == "Scorpion")
+```
+
+
+Here's the question that you can answer but you're also welcome to come up with your own:
+
+If you look at the billboard 100 for the past 50 years, how have songs changed in terms of danceability, ebergy, loudness, mode, speechiness, instumentalness, liveness, tmepo, etc. You can average each attrbibute across the top 100 songs in each year.
+
+You can have mutliple panel line charts or one graph with multiple lines for each of the attributes above. On the Y axis you have the attributes and on the X axis you have the time.
+
+<!-- You can get the billboard 100 data [here](https://www.kaggle.com/rakannimer/billboard-lyrics). The data is available from 1964-2015. -->
+
+
+
+
+
+
