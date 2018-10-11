@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # install.packages("remotes")
 # remotes::install_github("charlie86/spotifyr")
 # install.packages("ggplot2")
-
+# install.packages("knitr")
+library(knitr)
 library(ggplot2)
 library(remotes)
 library(dplyr)
@@ -19,6 +20,7 @@ library(spotifyr)
 ```
 
 ```{r setup-spotify}
+
 
 
 load("data/token.rda")
@@ -40,14 +42,42 @@ Notes:
 
 The following code chunk can be used to get all the songs by an artist. The output is a dataframe of songs, including song names, album names, album release date, album popularity, song popularity, danceability, energy, loudness, mode, speechiness, instrumentalness, livenss, acousticness, valence, tempo, and duration. 
 
-For example , we used the *"Spotifyr"* Package to get the data about Drake's 2018 album 'Scorpion'
+## Data
 
-```{r}
+The data collected shows all types of information , such as:
+
+- *Danceability*
+- *Release Date Info*
+- *Popularity*
+- *Etc.*
+
+For Example, the information for the artist [Drake](https://en.wikipedia.org/wiki/Drake_(musician)) is shown below and was pulled using the Spotifyr package.
+
+```{r, echo=FALSE}
 scorpion <- get_artist_audio_features('Drake') %>%
   filter(album_name == "Scorpion")
+
+drake_songs <- get_artist_audio_features('Drake')
+
+kable(scorpion)
 ```
 
+So as you can see below, i've filtered the data for Scorpion and pulled out only the danceability, speechiness and tempo.
 
+
+```{r}
+scorpion %>%
+  select(track_name, speechiness) %>%
+  arrange(-speechiness, track_name)
+
+scorpion %>%
+  select(track_name, danceability) %>%
+  arrange(-danceability, track_name)  
+  
+scorpion %>%
+  select(track_name, tempo) %>%
+  arrange(-tempo, track_name)
+```
 Here's the question that you can answer but you're also welcome to come up with your own:
 
 If you look at the billboard 100 for the past 50 years, how have songs changed in terms of danceability, ebergy, loudness, mode, speechiness, instumentalness, liveness, tmepo, etc. You can average each attrbibute across the top 100 songs in each year.
@@ -57,7 +87,62 @@ You can have mutliple panel line charts or one graph with multiple lines for eac
 <!-- You can get the billboard 100 data [here](https://www.kaggle.com/rakannimer/billboard-lyrics). The data is available from 1964-2015. -->
 
 
+## Plots 1
 
+**I want to create plots showing each artists songs on their album and what they show about the danceability, tempo and speechiness.**
 
+Hopefully i can answer the question of whether songs had more danceability in the past or now and whether speechiness or tempo had anything to do with it.
 
+I created an example plot showing The danceability of all of Drake's music plotted against the tempo. I wanted to see if tempo had an effect on danceability , which from the plot you can see, it does not.
+
+```{r, warning=FALSE, echo=FALSE}
+ggplot(drake_songs, aes(x=danceability, y=tempo)) +
+  geom_point()
+```
+
+The thing we're gonna be plotting against the most is the change in an artists' songs over time. With time being the x-axis, we're gonna plot the different attributes of an artists' tracks and/or album and see the change over time. Starting with Drake, a plot was generated below. As you can see, dancebability and speechiness doesnt seem to have enough of a prevalent relatonship to really analyze anything we couldnt have already seen anyway.
+
+```{r, warning=FALSE, echo=FALSE}
+ggplot(scorpion, aes(x=speechiness, y=danceability)) +
+  geom_line() +
+  xlab("Speechiness") +
+  ylab("Danceability")
+```
+ 
+## Plots 2
+ 
+So now, im gonna try to see if I can take each variable individually (speechiness, tempo and danceability) and plot it against the time of its release for Drake's whole collection of songs, not just from his album Scorpion.
+
+Starting off with danceability, a plot was created below.
+ 
+```{r}
+drake_songs %>%
+  ggplot(aes(x=album_release_date, y=danceability)) +
+  geom_point()
+```
+
+Now We're getting somewhere, as you can see, apparently Drake's
+songs have gotten more danceable over time and apparently in 2015 none of his songs seemed to be danceable at all!
+
+Moving on to speechiness, a plot was generated below
+
+```{r}
+drake_songs %>%
+  ggplot(aes(x=album_release_date, y=speechiness)) +
+  geom_line()
+```
+
+I used a line plot to see whether Drake's songs have gone down
+or up in terms of speechiness and I have to say I agree with
+the visualization, being a Drake fan myself. I feel like Drake is known for his speechiness and in the plot you can see that he started out very speechy back in 2009, his beginnings.Since then though, its gone down and stayed in limbo really going down and up little bits. After a all time low in 2014 it looks like he went through another limbo until he got it together and is now back on a rise in 2018. 
+
+Lastly, I wanna see the role tempo has played in all of this.A plot was generated below.
+
+```{r}
+drake_songs %>%
+  ggplot(aes(x=album_release_date, y=tempo)) +
+  geom_line()
+```
+
+Really, his tempo has been all over the place and i can attest to that. His highest year in tempo was in 2012.
 
